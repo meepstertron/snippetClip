@@ -1,6 +1,7 @@
-import { Badge } from "lucide-react";
-import { Card, CardContent, CardTitle } from "./ui/card";
-import { CopyBlock } from 'react-code-blocks';
+import { ArrowBigUp, Copy, EllipsisVertical } from "lucide-react";
+import { Badge } from "./ui/badge";
+import { Card, CardContent, CardFooter, CardTitle } from "./ui/card";
+import { CodeBlock } from 'react-code-blocks';
 interface Post {
     id: number;
     title: string;
@@ -8,6 +9,9 @@ interface Post {
     code: string;
     language: string;
     tags: string[];
+    upvotes: number;
+    copies: number;
+    author: string;
 }
 
 interface FeedComponentProps {
@@ -17,23 +21,40 @@ interface FeedComponentProps {
 function FeedComponent({posts}: FeedComponentProps) {
     return ( 
     <>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-3 gap-4">
             {posts.map((post: Post) => (
                 <Card>
-                    <CardTitle>{post.title}</CardTitle>
+                    <div className="flex justify-between mt-3 ml-3 mb-2">
+                        <CardTitle className="text-left">
+                            <span>{post.title}</span>
+                        </CardTitle>
+                        <span className="mr-3"><EllipsisVertical /></span>
+                    </div>
                     <CardContent>
-                        <CopyBlock
+                        <CodeBlock
                             text={post.code}
                             language={post.language}
                             showLineNumbers={true}
                         />
                     </CardContent>
-                    <div>
+                    <div className="mb-3">
                         {post.tags.map((tag) => (
-                            <Badge>{tag}</Badge>
+                            <Badge className="mr-1 cursor-pointer" onClick={() => location.href = "/tag/" + tag }>#{tag}</Badge>
                         ))}
                     </div>
-
+                    <CardFooter>
+                        <div className="flex justify-between w-full">
+                            <div>
+                                <span className="text-muted-foreground rounded hover:bg-muted-foreground text-sm mr-3">
+                                    <ArrowBigUp style={{ display: 'inline' }} className="mr-1" />{post.upvotes}
+                                </span>
+                                <span className="text-muted-foreground rounded hover:bg-muted-foreground text-sm">
+                                    <Copy style={{ display: 'inline' }} className="mr-1" />{post.copies}
+                                </span>
+                            </div>
+                            <span className="text-muted-foreground text-sm ml-auto">{post.author}</span>
+                        </div>
+                    </CardFooter>
                 </Card>
 
             ))}

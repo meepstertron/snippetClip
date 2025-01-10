@@ -8,7 +8,10 @@ let posts = [
         body: "This is a snippet of code that prints 'Hello World'",
         code: "console.log('Hello World')",
         language: "JavaScript",
-        tags: ["example", "beginner"]
+        tags: ["example", "beginner"],
+        upvotes: 10,
+        copies: 5,
+        author: "John Doe"
 
     }
 ]
