@@ -1,7 +1,13 @@
+import { Badge } from "lucide-react";
+import { Card, CardContent, CardTitle } from "./ui/card";
+import { CopyBlock } from 'react-code-blocks';
 interface Post {
     id: number;
     title: string;
     body: string;
+    code: string;
+    language: string;
+    tags: string[];
 }
 
 interface FeedComponentProps {
@@ -13,10 +19,23 @@ function FeedComponent({posts}: FeedComponentProps) {
     <>
         <div className="grid grid-cols-4 gap-4">
             {posts.map((post: Post) => (
-                <div key={post.id} className="border p-4">
-                    <h2 className="text-lg font-semibold">{post.title}</h2>
-                    <p className="text-sm text-gray-500">{post.body}</p>
-                </div>
+                <Card>
+                    <CardTitle>{post.title}</CardTitle>
+                    <CardContent>
+                        <CopyBlock
+                            text={post.code}
+                            language={post.language}
+                            showLineNumbers={true}
+                        />
+                    </CardContent>
+                    <div>
+                        {post.tags.map((tag) => (
+                            <Badge>{tag}</Badge>
+                        ))}
+                    </div>
+
+                </Card>
+
             ))}
         </div>
     </>
