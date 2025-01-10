@@ -6,7 +6,6 @@ let posts = [
     {
         id: 1,
         title: "Hello World",
-        body: "This is a snippet of code that prints 'Hello World'",
         code: "console.log('Hello World')",
         language: "JavaScript",
         tags: ["example", "beginner"],
@@ -17,7 +16,6 @@ let posts = [
     {
         id: 1,
         title: "Flask Example",
-        body: "This is a snippet of code that prints 'Hello World'",
         code: "@app.route('/hello')\ndef hello():\n    return 'Hello, World!'",
         language: "python",
         tags: ["Flask", "beginner", "example"],

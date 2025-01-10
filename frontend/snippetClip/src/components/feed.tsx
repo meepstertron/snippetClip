@@ -6,7 +6,6 @@ import { useTheme } from "./theme-provider";
 interface Post {
     id: number;
     title: string;
-    body: string;
     code: string;
     language: string;
     tags: string[];
