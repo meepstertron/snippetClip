@@ -1,4 +1,4 @@
-export function activate(context: any) {
+export function activate(context: any = {}) {
     // Your activation logic here
 }
 
