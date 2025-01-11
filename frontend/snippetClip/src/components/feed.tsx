@@ -3,6 +3,10 @@ import { Badge } from "./ui/badge";
 import { Card, CardContent, CardFooter, CardTitle } from "./ui/card";
 import { CodeBlock, a11yDark, a11yLight } from 'react-code-blocks';
 import { useTheme } from "./theme-provider";
+
+import $ from "jquery";
+import config from "@/config";
+
 interface Post {
     id: number;
     title: string;
@@ -24,6 +28,25 @@ function FeedComponent({posts}: FeedComponentProps) {
     const themeMap = {
         light: a11yLight,
         dark: a11yDark
+    }
+
+    function copyCodeToClipboard(code: string, id: number) {
+        navigator.clipboard.writeText(code);
+        $.ajax({
+            url: `${config.apiUrl}/api/post/${id}/copy`,
+            type: 'POST',
+            success: function(data) {
+                console.log(data);
+                const postElement = document.querySelector(`[data-post-id="${id}"]`);
+                if (postElement) {
+                    const copiesElement = postElement.querySelector('.copies-count');
+                    if (copiesElement) {
+                        copiesElement.textContent = (parseInt(copiesElement.textContent || '0') + 1).toString();
+                    }
+                }
+            }
+        });
+
     }
 
     return ( 
@@ -53,10 +76,10 @@ function FeedComponent({posts}: FeedComponentProps) {
                     <CardFooter>
                         <div className="flex justify-between w-full">
                             <div>
-                                <span className="text-muted-foreground rounded hover:bg-muted-foreground text-sm mr-3">
+                                <span className="text-muted-foreground rounded hover:bg-muted hover:bg-opacity-20 text-sm mr-3">
                                     <ArrowBigUp style={{ display: 'inline' }} className="mr-1" size={24} />{post.upvotes}
                                 </span>
-                                <span className="text-muted-foreground rounded hover:bg-muted-foreground text-sm">
+                                <span onClick={() => copyCodeToClipboard(post.code, post.id)} className="text-muted-foreground rounded hover:bg-muted text-sm cursor-pointer">
                                     <Copy style={{ display: 'inline' }} className="mr-1" size={16} />{post.copies}
                                 </span>
                             </div>
@@ -72,3 +95,6 @@ function FeedComponent({posts}: FeedComponentProps) {
 }
 
 export default FeedComponent;
+
+
+

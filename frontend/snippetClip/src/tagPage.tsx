@@ -3,6 +3,7 @@ import { Hash } from "lucide-react";
 import FeedComponent from "./components/feed";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import config from "./config";
 
 import $ from "jquery";
 
@@ -52,7 +53,7 @@ function TagPage() {
 
     useEffect(() => {
         $.ajax({
-            url: `http://localhost:5000/api/tag/${tag}`,
+            url: `${config.apiUrl}/api/tag/${tag}`,
             type: 'GET',
             success: function(data) {
                 const formattedPosts: Post[] = data.posts.map((post: any) => ({
