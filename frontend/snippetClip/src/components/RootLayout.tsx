@@ -1,4 +1,5 @@
 import { HeaderBar } from "./HeaderBar"
+import { Toaster } from "@/components/ui/toaster"
 
 interface RootLayoutProps {
   children: React.ReactNode
@@ -29,6 +30,7 @@ export function RootLayout({
       <main className="flex-grow w-full">
         {children}
       </main>
+      <Toaster />
     </div>
   )
 }

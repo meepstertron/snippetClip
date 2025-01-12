@@ -1,6 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, User, Settings, LogOut, LogIn } from 'lucide-react'
+import useExtension from "@/hooks/useExtension"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,8 +27,9 @@ interface HeaderBarProps {
 }
 
 export function HeaderBar({ username, avatarUrl, onLogin, onLogout, onCreateNew }: HeaderBarProps) {
+  const { connected, reconnect } = useExtension()
   const isLoggedIn = !!username
-
+ 
   return (
     <header className="w-full bg-background border-b">
       <div className="w-full px-4 py-3 flex items-center justify-between">
@@ -59,6 +68,32 @@ export function HeaderBar({ username, avatarUrl, onLogin, onLogout, onCreateNew 
             Log In
           </Button>
         )}
+        <TooltipProvider>
+          <Tooltip>
+            {connected ? (
+                <>
+                  <TooltipTrigger onClick={() => {  }}>
+                    <span className="text-muted-foreground text-sm flex items-center">
+                    <div className="rounded-full w-2 h-2 bg-green-600 mr-2 animate-pulse"></div>
+                    Connected
+                    </span>
+                    <TooltipContent>Connected to the VS Code extension</TooltipContent>
+                  </TooltipTrigger>
+                </>
+
+            ) : (
+                <>
+                  <TooltipTrigger onClick={() => { reconnect() }}>
+                    <span className="text-muted-foreground text-sm flex items-center">
+                    <div className="rounded-full w-2 h-2 bg-red-600 mr-2"></div>
+                    Not Connected
+                    </span>
+                    <TooltipContent>Not connected to the VS Code extension consider downloading it or click to try again</TooltipContent>
+                  </TooltipTrigger>
+                </>
+              )}
+            </Tooltip>
+        </TooltipProvider>
         <Button size="sm" onClick={onCreateNew}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Create New

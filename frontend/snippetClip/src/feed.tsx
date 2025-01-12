@@ -15,6 +15,7 @@ let posts = [
     }
 ]
 
+
 function Feed() {
     return ( 
         <div>

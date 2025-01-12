@@ -9,11 +9,32 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { authenticate } from "@/hooks/useToken"
+import { toast } from "@/hooks/use-toast"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+
+  async function submitForm(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    let response: any = await authenticate(email, password);
+    toast({
+      title: response.error ? "Error" : "Success",
+      description: response.error
+        ? response.error
+        : "You have successfully logged in",
+      variant: response.error ? "destructive" : "default",
+    });
+    if (!response.error) {
+      location.href = '/';
+    }
+  }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -24,13 +45,14 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={submitForm}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="m@example.com"
                   required
                 />
@@ -39,20 +61,18 @@ export function LoginForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   <a
-                    href="#"
+                    href="/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" name="password" required />
               </div>
               <Button type="submit" className="w-full">
                 Login
               </Button>
-              <Button variant="outline" className="w-full">
-                Login with Google
-              </Button>
+
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}

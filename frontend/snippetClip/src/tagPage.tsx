@@ -25,24 +25,15 @@ function TagPage() {
     const [posts, setPosts] = useState([
         {
             id: 1,
-            title: "Hello World",
-            code: "console.log('Hello World')",
+            title: "Loading...",
+            code: "posts.loading = true",
             language: "JavaScript",
-            tags: ["example", "beginner"],
+            tags: ["loading", "Hackclub-HighSeas2024"],
             upvotes: 10,
             copies: 5,
             author: "John Doe"
         },
-        {
-            id: 1,
-            title: "Flask Example",
-            code: "@app.route('/hello')\ndef hello():\n    return 'Hello, World!'",
-            language: "python",
-            tags: ["Flask", "beginner", "example"],
-            upvotes: 7,
-            copies: 60,
-            author: "John Doe"
-        }
+
     ]);
     const [tagdata, setTag] = useState<{ color: string; icon: string }>({ color: '', icon: '' });
 
@@ -67,8 +58,8 @@ function TagPage() {
     }, [tag]);
 
     return ( 
-        <div className="m-0 p-0 h-screen w-screen">
-            <div className="h-1/3 bg-muted flex items-center pl-6">
+        <div className="m-0 p-0 h-screen w-screen no-scrollbar overflow-hidden">
+            <div className="h-1/3 bg-muted flex items-center pl-6 no-scrollbar">
                 {tag && (
                     <React.Suspense fallback={<Hash width={48} height={48} className="text-white" />}>
                         <div className="bg-blue-600 w-16 h-16 rounded flex justify-center items-center" style={{ backgroundColor: '#'+tagdata.color }}>
