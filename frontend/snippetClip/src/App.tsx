@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react'
 import { fetchUser } from '@/hooks/useToken'
 import CreateSnippet from './createSnippet'
 import UserPage from './User'
+import SearchPage from './search'
 
 function App() {
 
@@ -57,6 +58,7 @@ function App() {
           <Route path="/" element={<Feed />} />
           <Route path='/tag/:tag' element={<TagPage />} />
           <Route path='/u/:user' element={<UserPage />} />
+          <Route path='/search/:query' element={<SearchPage />} />
           <Route path='/register' element={<Page />} />
           <Route path='/login' element={<Page />} />
           <Route path="/create" element={<CreateSnippet />} />

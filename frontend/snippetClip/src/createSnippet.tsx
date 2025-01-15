@@ -8,13 +8,14 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
-
-
+import config from "./config"
+import TagSelector from "./components/tagSelector"
 
 function CreateSnippet() {
   const [title, setTitle] = useState("")
   const [language, setLanguage] = useState("javascript")
   const [code, setCode] = useState("")
+  const [tags, setTags] = useState<string[]>([])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,12 +23,26 @@ function CreateSnippet() {
       toast({
         title: "Error",
         description: "Please fill in all fields",
-        variant: "destructive",
+        variant: "default",
       })
       return
     }
-    // Here you would typically send the data to your backend
-    console.log({ title, language, code })
+    
+    fetch(`${config.apiUrl}/api/snippets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        title,
+        language,
+        code,
+        tags,
+      })
+    });
+
+    console.log({ title, language, code, tags })
     toast({
       title: "Success",
       description: "Snippet created successfully!",
@@ -91,6 +106,11 @@ function CreateSnippet() {
                     <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
+
+              <TagSelector 
+                tags={tags}
+                setTags={setTags}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="code">Code</Label>

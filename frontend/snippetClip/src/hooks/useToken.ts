@@ -62,5 +62,25 @@ export const fetchUser = () => {
         });
 };
 
+export async function register(email: string, username: string, password: string) {
+  try {
+    const response = await fetch(`${config.apiUrl}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, username, password }),
+    });
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return { error: data.message || 'Registration failed' };
+    }
+    
+    return data;
+  } catch (error) {
+    return { error: 'Failed to connect to the server' };
+  }
+}
 
 export default useToken;
