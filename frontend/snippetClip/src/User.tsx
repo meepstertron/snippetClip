@@ -3,11 +3,14 @@ import config from "./config";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage} from "./components/ui/avatar";
+import { formatDistanceToNow } from 'date-fns';
 
 function UserPage() {
     const { user } = useParams();
     const [posts, setPosts] = useState([]);
     const [notFound, setNotFound] = useState(false);
+    const [userDetails, setUserDetails] = useState<any>(null);
+
 
     useEffect(() => {
         fetch(`${config.apiUrl}/api/user?username=${user}`, {
@@ -23,7 +26,10 @@ function UserPage() {
             }
             return response.json();
         })
-        .then(data => setPosts(data.posts))
+        .then(data => {
+            setUserDetails(data.user);
+            setPosts(data.posts);
+        })
         .catch(error => console.error('Error fetching posts:', error));
     }, [user]);
 
@@ -38,6 +44,24 @@ function UserPage() {
         );
     }
 
+    if (!userDetails) {
+        return (
+            <div className="h-screen w-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-muted-foreground">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    let timeAgo = 'recently';
+    if (userDetails.join_timestamp && userDetails.join_timestamp !== '0000-00-00 00:00:00') {
+        const joinDate = new Date(userDetails.join_timestamp);
+        if (!isNaN(joinDate.getTime()) && joinDate.getFullYear() > 1970) {
+            timeAgo = formatDistanceToNow(joinDate, { addSuffix: true });
+        }
+    }
+
     return ( 
     <div className="m-0 p-0 h-screen w-screen">
         <div className="h-1/3 bg-muted flex items-center pl-6">
@@ -49,7 +73,7 @@ function UserPage() {
                     </Avatar>
                     <div className="ml-4">
                         <h1 className="text-2xl font-semibold">{user}</h1>
-                        <p className="text-gray-500">Joined 1 month ago</p>
+                        <p className="text-gray-500">Joined {timeAgo}</p>
                     </div>
                     
                 </div>

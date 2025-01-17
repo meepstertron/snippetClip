@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
 import config from "./config"
 import TagSelector from "./components/tagSelector"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./components/ui/tooltip"
 
 function CreateSnippet() {
   const [title, setTitle] = useState("")
@@ -28,7 +29,7 @@ function CreateSnippet() {
       return
     }
     
-    fetch(`${config.apiUrl}/api/snippets`, {
+    fetch(`${config.apiUrl}/api/post`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -126,7 +127,20 @@ function CreateSnippet() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">Create Snippet</Button>
+            {localStorage.getItem("token") ? (
+              <Button type="submit">Create Snippet</Button>
+            ) : (
+                <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" disabled={true}>Create Snippet</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Login to upload your snippet</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            
+
           </CardFooter>
         </form>
       </Card>

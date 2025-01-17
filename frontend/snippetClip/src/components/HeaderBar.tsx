@@ -65,7 +65,7 @@ export function HeaderBar({ username, avatarUrl, onLogin, onLogout, onCreateNew,
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hidden">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>

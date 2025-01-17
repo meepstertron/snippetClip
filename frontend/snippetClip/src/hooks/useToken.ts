@@ -38,6 +38,7 @@ export const authenticate = (username: string, password: string) => {
         .then((data) => data.json())
         .then((data) => {
             localStorage.setItem('token', JSON.stringify(data.token));
+            localStorage.setItem('userid', JSON.stringify(data.userid));
             return data;
         });
 };

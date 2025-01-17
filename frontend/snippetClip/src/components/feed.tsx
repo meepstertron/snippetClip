@@ -27,6 +27,7 @@ interface Post {
     upvotes: number;
     copies: number;
     author: string;
+    upvote_ids: number[];
 }
 
 interface FeedComponentProps {
@@ -41,13 +42,41 @@ function FeedComponent({posts}: FeedComponentProps) {
         dark: a11yDark
     }
 
+    function upvotePost(id: number) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Handle not logged in case
+            return;
+        }
+
+        $.ajax({
+            url: `${config.apiUrl}/api/post/upvote`,
+            type: 'POST',
+            headers: {
+                'Authorization': token
+            },
+            data: JSON.stringify({ id: id }),
+            contentType: 'application/json',
+            success: function(data) {
+                const postElement = document.querySelector(`[data-post-id="${id}"]`);
+                if (postElement) {
+                    const upvotesElement = postElement.querySelector('.upvotes-count');
+                    if (upvotesElement) {
+                        upvotesElement.textContent = (parseInt(upvotesElement.textContent || '0') + 1).toString();
+                    }
+                }
+            }
+        });
+    }
+
     function copyCodeToClipboard(code: string, id: number) {
         navigator.clipboard.writeText(code);
         $.ajax({
-            url: `${config.apiUrl}/api/post/${id}/copy`,
+            url: `${config.apiUrl}/api/post/copy`,
             type: 'POST',
+            data: JSON.stringify({ id: id }),
+            contentType: 'application/json',
             success: function(data) {
-                console.log(data);
                 const postElement = document.querySelector(`[data-post-id="${id}"]`);
                 if (postElement) {
                     const copiesElement = postElement.querySelector('.copies-count');
@@ -57,15 +86,15 @@ function FeedComponent({posts}: FeedComponentProps) {
                 }
             }
         });
-
     }
+
     const { insertIntoDocument, connected } = useExtension();
     return ( 
     <>
         <div className="grid grid-cols-3 gap-4">
             {posts.map((post: Post) => (
-                <DropdownMenu>
-                    <Card className="flex flex-col justify-between">
+                <DropdownMenu key={post.id}>
+                    <Card className="flex flex-col justify-between" data-post-id={post.id}>
                         <div className="flex justify-between mt-3 ml-3 mb-2">
                             <CardTitle className="text-left">
                                 <span className="ml-3">{post.title}</span>
@@ -77,7 +106,7 @@ function FeedComponent({posts}: FeedComponentProps) {
                                 <DropdownMenuItem onClick={() => insertIntoDocument(post.code)} disabled={!connected}>Send to VSCode</DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>Copy</DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-800">Report</DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-800 hidden">Report</DropdownMenuItem>
 
                             </DropdownMenuContent>
                         </div>
@@ -97,11 +126,18 @@ function FeedComponent({posts}: FeedComponentProps) {
                         <CardFooter>
                             <div className="flex justify-between w-full">
                                 <div>
-                                    <span className="text-muted-foreground rounded hover:bg-muted hover:bg-opacity-20 text-sm mr-3">
-                                        <ArrowBigUp style={{ display: 'inline' }} className="mr-1" size={24} />{post.upvotes}
+                                    <span 
+                                        onClick={() => upvotePost(post.id)}
+                                        className={`text-muted-foreground rounded hover:bg-muted hover:bg-opacity-20 text-sm mr-3 cursor-pointer ${
+                                            post.upvote_ids.includes(parseInt(localStorage.getItem('userid') || '0')) ? 'text-blue-500' : ''
+                                        }`}
+                                    >
+                                        <ArrowBigUp style={{ display: 'inline' }} className="mr-1" size={24} />
+                                        <span className="upvotes-count">{post.upvotes}</span>
                                     </span>
                                     <span onClick={() => copyCodeToClipboard(post.code, post.id)} className="text-muted-foreground rounded hover:bg-muted text-sm cursor-pointer">
-                                        <Copy style={{ display: 'inline' }} className="mr-1" size={16} />{post.copies}
+                                        <Copy style={{ display: 'inline' }} className="mr-1" size={16} />
+                                        <span className="copies-count">{post.copies}</span>
                                     </span>
                                 </div>
                                 <span className="text-muted-foreground text-sm ml-auto underline"><a href={"/u/"+ post.author}>{post.author}</a></span>

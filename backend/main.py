@@ -43,6 +43,7 @@ def auth():
         return jsonify({'error': 'Internal server error'}), 500
 
     user = connection.execute(text("SELECT * FROM users WHERE email = :username"), {'username': username}).fetchone()
+    user_id = user[0]
     if user is None:
         connection.close()
         return jsonify({'error': 'Invalid username or password'}), 401
@@ -60,7 +61,7 @@ def auth():
     else:
         token = user[4]
         connection.close()
-        return jsonify({'token': token}), 200
+        return jsonify({'token': token, 'id': user_id}), 200
     
 @app.route('/register', methods=['POST'])
 def register():
@@ -85,6 +86,57 @@ def register():
     return jsonify({'message': 'User created successfully'}), 201
 
 
+@app.route('/api/post/<action>', methods=['POST'])
+def action(action):
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify({'error': 'Internal server error'}), 500
+    
+    request_data = request.get_json()
+    post_id = request_data['id']
+    if action == "upvote":
+        token = request.headers.get('Authorization')
+        token = token[1:] if token.startswith('"') else token
+        token = token[:-1] if token.endswith('"') else token
+        
+        user = connection.execute(text("SELECT * FROM users WHERE token = :token"), {'token': token}).fetchone()
+        if user is None:
+            connection.close()
+            return jsonify({'error': 'Invalid token'}), 401
+        
+        post = connection.execute(text("SELECT * FROM snippets WHERE id = :id"), {'id': post_id}).fetchone()
+        if post is None:
+            connection.close()
+            return jsonify({'error': 'Invalid post id'}), 404
+        
+        upvotes = post[6]
+        upvote_ids = json.loads(post[8])
+        
+        if user[0] in upvote_ids:
+            connection.close()
+            return jsonify({'error': 'User already upvoted this post'}), 400
+        
+        upvotes += 1
+        upvote_ids.append(user[0])
+        connection.execute(text("UPDATE snippets SET upvotes = :upvotes, upvote_ids = :upvote_ids WHERE id = :id"), {'upvotes': upvotes, 'upvote_ids': json.dumps(upvote_ids), 'id': post_id})
+        connection.commit()
+        connection.close()
+        return jsonify({'message': 'Post upvoted successfully'}), 200
+    
+    elif action == "copy":
+        post = connection.execute(text("SELECT * FROM snippets WHERE id = :id"), {'id': post_id}).fetchone()
+        if post is None:
+            connection.close()
+            return jsonify({'error': 'Invalid post id'}), 404
+        
+        copies = int(post[7]) if post[7] else 0  # Convert to int and handle None case
+        copies += 1
+        connection.execute(text("UPDATE snippets SET copies = :copies WHERE id = :id"), {'copies': copies, 'id': post_id})
+        connection.commit()
+        connection.close()
+        return jsonify({'message': 'Post copied successfully'}), 200
+
+
 @app.route('/api/posts/<sort>')
 def posts(sort):
     connection = get_db_connection()
@@ -93,6 +145,7 @@ def posts(sort):
     
     if sort == 'new':
         posts = connection.execute(text("SELECT * FROM snippets ORDER BY created DESC LIMIT 20")).fetchall()
+        posts = list(reversed(posts))
     elif sort == 'top':
         posts = connection.execute(text("SELECT * FROM snippets ORDER BY upvotes DESC LIMIT 20")).fetchall()
     elif sort == 'random':
@@ -164,6 +217,36 @@ def userinfo():
     user_dict.pop('token')
     connection.close()
     return jsonify(user_dict), 200
+
+@app.route('/api/post', methods=['POST'])
+def post():
+    request_data = request.get_json()
+    title = request_data['title']
+    code = request_data['code']
+    tags = request_data['tags']
+    language = request_data['language']
+    token = request.headers.get('Authorization')
+    token = token[1:] if token.startswith('"') else token
+    token = token[:-1] if token.endswith('"') else token  # Fixed endswith syntax
+    
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify({'error': 'Internal server error'}), 500
+    
+    user = connection.execute(text("SELECT * FROM users WHERE token = :token"), {'token': token}).fetchone()
+    if user is None:
+        connection.close()
+        return jsonify({'error': 'Invalid token'}), 401
+    
+    tags = json.dumps(tags)
+    empty_upvotes = json.dumps([])
+    connection.execute(
+        text("INSERT INTO snippets (title, code, tags, authorid, language, upvotes, upvote_ids, copies) VALUES (:title, :code, :tags, :authorid, :language, 0, :upvote_ids, 0)"),
+        {'title': title, 'code': code, 'tags': tags, 'authorid': user[0], 'language': language, 'upvote_ids': empty_upvotes}
+    )
+    connection.commit()
+    connection.close()
+    return jsonify({'message': 'Post created successfully'}), 201
 
 
 @app.route('/api/user', methods=['GET'])
