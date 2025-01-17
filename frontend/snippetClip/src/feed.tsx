@@ -72,12 +72,12 @@ function Feed() {
                     </Card>
                 </a>
                 
-                <a href="/release-notes" className="cursor-pointer no-underline">
+                <a href="https://github.com/meepstertron/snippetClip/blob/main/change-log.md" className="cursor-pointer no-underline">
                     <Card className="bg-gradient-to-r from-background via-background min-h-full to-green-950 p-3 flex flex-col justify-between">
                         <div>
                             <CardTitle>1.0 Release</CardTitle>
                             <CardContent className="p-0 pt-3 text-sm text-muted-foreground">
-                                I am thrilled to announce the 1.0 release of SnippetClip. Many features have been added and bugs have been fixed. Any bugs do occur please Report them.
+                                I am thrilled to announce the 1.0 release of SnippetClip. Features have been added and bugs have been fixed. Any bugs do occur please Report them.
                             </CardContent>
                         </div>
                         <CardFooter className="flex justify-end p-0">
