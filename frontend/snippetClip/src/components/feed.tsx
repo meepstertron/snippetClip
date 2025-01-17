@@ -10,7 +10,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
@@ -27,14 +26,14 @@ interface Post {
     upvotes: number;
     copies: number;
     author: string;
-    upvote_ids: number[];
+    upvote_ids?: number[];
 }
 
 interface FeedComponentProps {
-    posts: Post[];
+    posts?: Post[];
 }
 
-function FeedComponent({posts}: FeedComponentProps) {
+function FeedComponent({posts = []}: FeedComponentProps) {
     const { theme } = useTheme();
     const resolvedTheme = theme === 'system' ? 'light' : theme;
     const themeMap = {
@@ -45,7 +44,7 @@ function FeedComponent({posts}: FeedComponentProps) {
     function upvotePost(id: number) {
         const token = localStorage.getItem('token');
         if (!token) {
-            // Handle not logged in case
+            
             return;
         }
 
@@ -57,7 +56,7 @@ function FeedComponent({posts}: FeedComponentProps) {
             },
             data: JSON.stringify({ id: id }),
             contentType: 'application/json',
-            success: function(data) {
+            success: function() {
                 const postElement = document.querySelector(`[data-post-id="${id}"]`);
                 if (postElement) {
                     const upvotesElement = postElement.querySelector('.upvotes-count');
@@ -76,7 +75,7 @@ function FeedComponent({posts}: FeedComponentProps) {
             type: 'POST',
             data: JSON.stringify({ id: id }),
             contentType: 'application/json',
-            success: function(data) {
+            success: function() {
                 const postElement = document.querySelector(`[data-post-id="${id}"]`);
                 if (postElement) {
                     const copiesElement = postElement.querySelector('.copies-count');
@@ -92,7 +91,7 @@ function FeedComponent({posts}: FeedComponentProps) {
     return ( 
     <>
         <div className="grid grid-cols-3 gap-4">
-            {posts.map((post: Post) => (
+            {posts?.map((post: Post) => (
                 <DropdownMenu key={post.id}>
                     <Card className="flex flex-col justify-between" data-post-id={post.id}>
                         <div className="flex justify-between mt-3 ml-3 mb-2">
@@ -129,7 +128,7 @@ function FeedComponent({posts}: FeedComponentProps) {
                                     <span 
                                         onClick={() => upvotePost(post.id)}
                                         className={`text-muted-foreground rounded hover:bg-muted hover:bg-opacity-20 text-sm mr-3 cursor-pointer ${
-                                            post.upvote_ids.includes(parseInt(localStorage.getItem('userid') || '0')) ? 'text-blue-500' : ''
+                                            post.upvote_ids?.includes(parseInt(localStorage.getItem('userid') || '0')) ? 'text-blue-500' : ''
                                         }`}
                                     >
                                         <ArrowBigUp style={{ display: 'inline' }} className="mr-1" size={24} />

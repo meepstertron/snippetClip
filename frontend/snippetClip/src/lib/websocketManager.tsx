@@ -16,15 +16,24 @@ class WebSocketManager {
       return WebSocketManager.instance;
     }
   
+    private clearReconnectTimer() {
+      if (this.reconnectTimer) {
+        clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = null;
+      }
+    }
+  
     connect() {
       if (this.ws?.readyState === WebSocket.CONNECTING) return;
       if (this.ws?.readyState === WebSocket.OPEN) return;
       
+      this.clearReconnectTimer();
       this.ws = new WebSocket('ws://localhost:8080');
       
       this.ws.onopen = () => {
         console.log('WebSocket connected');
         this.reconnectAttempts = 0;
+        this.clearReconnectTimer();
         this.notifyListeners(true);
       };
   
