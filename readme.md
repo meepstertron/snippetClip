@@ -116,7 +116,7 @@ Distributed under the MIT License. See [MIT License](https://opensource.org/lice
 
 Meepstertron - [HackClub Slack](https://hackclub.slack.com/team/U087PR1B2HX) - jan.koch@hexagonical.ch
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+Project Link: [https://github.com/meepstertron/snippetClip](https://github.com/meepstertron/snippetClip)
 ## Acknowledgments
 
 Cool stuff or people 
